@@ -1,9 +1,12 @@
 import discord
 import responses
+import openai
 import config
 from discord import app_commands
 from discord.ext import commands
 import random #for choose commmand
+global chatMessage
+
 
 async def send_message(message, user_message, is_private):
     try:
@@ -72,5 +75,8 @@ def run_discord_bot():
         except Exception as e:
             randomNumber = str("Invalid inputs! Please only put numbers in.")
         await interaction.response.send_message(randomNumber)
+
+
+
 
     bot.run(TOKEN)
