@@ -1,0 +1,2 @@
+This is where you put excel files to be read by the bot. For example, for the fill in the blank questions,
+the format should be: questions, answers for the two columns. You are able to label the first row in each column.

@@ -7,19 +7,29 @@ def initialize_quiz_database():  # first time start up, RUN THIS IF YOU HAVE NOT
     # SYSTEM
     conn = sqlite3.connect('quiz.db')
     cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE leaderboard (
-            user_id INTEGER PRIMARY KEY,
-            username TEXT,
-            score INTEGER
-        );
-    """)
-    cursor.execute("""
-        CREATE TABLE masterQuiz (
-            quiz_id INTEGER PRIMARY KEY,
-            quiz_name TEXT
-        );
-    """)
+    try:
+        cursor.execute("""
+                CREATE TABLE leaderboard (
+                    user_id INTEGER PRIMARY KEY,
+                    username TEXT,
+                    score INTEGER
+                );
+            """)
+    except sqlite3.OperationalError as e:
+        print("Error, leaderboard table already exists!")
+    except Exception as e:
+        print(f"Unknown error: {e}")
+    try:
+        cursor.execute("""
+                CREATE TABLE masterQuiz (
+                    quiz_id INTEGER PRIMARY KEY,
+                    quiz_name TEXT
+                );
+            """)
+    except sqlite3.OperationalError as e:
+        print("Error, master quiz table already exists!")
+    except Exception as e:
+        print(f"Unknown error: {e}")
     conn.commit()
     conn.close()
 
@@ -52,7 +62,11 @@ class QuizEdit:
     def add_question_excel(self, name, excel_file_name): #add multiple questions at once via excel files
         if '.xlsx' in excel_file_name:
             excel_file_name = excel_file_name.removesuffix('.xlsx')
-        df = pandas.read_excel(f'excel/{excel_file_name}.xlsx', header=None)
+        try:
+            df = pandas.read_excel(f'excel/{excel_file_name}.xlsx', header=None)
+        except Exception as e:
+            print(f"Error: {e}")
+
         first_row = df.iloc[0]
 
         header_words = ['question', 'answer']
@@ -75,9 +89,8 @@ class QuizEdit:
     def close(self):
         self.conn.close()
 
-
 db = QuizEdit()
-db.add_question_excel("quiz_test", "quiz_test2")
-# db.create_table("quiz_test", "question TEXT, answer TEXT")
-#db.addQuestion("quiz_test", ["What is the color of the sky?", "blue"]) format for adding questions
+db.create_table("quiz_uscapitals", "question TEXT, answer TEXT")
+db.add_question_excel("quiz_uscapitals", "quiz_uscapitals")
+#db.add_question("quiz_test", ["What is the color of the sky?", "blue"]) format for adding questions
 db.close()
