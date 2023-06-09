@@ -1,6 +1,5 @@
 import discord
 import responses
-import openai
 import config
 from discord import app_commands
 from discord.ext import commands
@@ -75,6 +74,11 @@ def run_discord_bot():
         except Exception as e:
             randomNumber = str("Invalid inputs! Please only put numbers in.")
         await interaction.response.send_message(randomNumber)
+
+    @bot.tree.command(name="quizpartial", description="Play a quiz and choose how many questions you want to play!")
+
+    #@bot.tree.command(name="quizlist", description="Lists all the quizzes that are available!")
+
 
 
 

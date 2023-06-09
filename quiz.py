@@ -23,7 +23,9 @@ def initialize_quiz_database():  # first time start up, RUN THIS IF YOU HAVE NOT
         cursor.execute("""
                 CREATE TABLE masterQuiz (
                     quiz_id INTEGER PRIMARY KEY,
-                    quiz_name TEXT
+                    quiz_name TEXT,
+                    quiz_display_name TEXT,
+                    quiz_description TEXT
                 );
             """)
     except sqlite3.OperationalError as e:
@@ -39,7 +41,7 @@ class QuizEdit:
         self.conn = sqlite3.connect('quiz.db')
         self.cursor = self.conn.cursor()
 
-    def create_table(self, name, column_definitions):
+    def create_table(self, name, column_definitions, displayname, description):
         sql = f"CREATE TABLE {name} ({column_definitions});"
         try:
             self.cursor.execute(sql)
@@ -47,6 +49,14 @@ class QuizEdit:
             print(f"Table '{name}' has been created!")
         except sqlite3.Error as e:
             print(f"Error creating table '{name}': {e}")
+        try:
+            self.cursor.execute('SELECT COUNT(*) FROM masterQuiz')
+            row_count = self.cursor.fetchone()[0]
+            sql = f"INSERT INTO masterQuiz (quiz_id, quiz_name, quiz_display_name, quiz_description) VALUES ({row_count}, '{name}', '{displayname}', '{description}')"
+            self.cursor.execute(sql)
+            self.conn.commit()
+        except Exception as e:
+            print(f"Error creating table key: {e}")
 
     def add_question(self, table_name, data): #add question singularly
         placeholders = ", ".join(['?'] * len(data))
@@ -88,9 +98,10 @@ class QuizEdit:
 
     def close(self):
         self.conn.close()
-
+initialize_quiz_database()
 db = QuizEdit()
-db.create_table("quiz_uscapitals", "question TEXT, answer TEXT")
+db.create_table("quiz_uscapitals", "question TEXT, answer TEXT", "US Capitals",
+                "This quiz set contains all 50 United States Captials and States!")
 db.add_question_excel("quiz_uscapitals", "quiz_uscapitals")
 #db.add_question("quiz_test", ["What is the color of the sky?", "blue"]) format for adding questions
 db.close()
