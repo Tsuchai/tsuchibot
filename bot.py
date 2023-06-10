@@ -76,6 +76,10 @@ def run_discord_bot():
         await interaction.response.send_message(randomNumber)
 
     @bot.tree.command(name="quizpartial", description="Play a quiz and choose how many questions you want to play!")
+    @app_commands.describe(quiz_id = "Id of the quiz you want to play. Use /quizlist if you are unsure.", questions = "Number of questions you want to play.")
+    #async def play(ctx, quiz_id: int, questions: int):
+
+
 
     #@bot.tree.command(name="quizlist", description="Lists all the quizzes that are available!")
 

@@ -69,13 +69,14 @@ class QuizEdit:
         except Exception as e:
             print(f"Unknown error: {e}")
 
-    def add_question_excel(self, name, excel_file_name): #add multiple questions at once via excel files
+    def add_question_excel(self, name, excel_file_name): #add multiple questions at once via excel file
         if '.xlsx' in excel_file_name:
             excel_file_name = excel_file_name.removesuffix('.xlsx')
         try:
             df = pandas.read_excel(f'excel/{excel_file_name}.xlsx', header=None)
         except Exception as e:
             print(f"Error: {e}")
+            return
 
         first_row = df.iloc[0]
 
