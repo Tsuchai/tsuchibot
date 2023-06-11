@@ -1,7 +1,8 @@
 import discord
 import responses
 import config
-import commands
+import quiz_logic
+from quiz_logic import active_games
 from discord import app_commands
 from discord.ext import commands
 import random #for choose commmand
@@ -47,8 +48,8 @@ def run_discord_bot():
         user_message = str(message.content)
         channel = str(message.channel)
 
-        if message.channel.id in commands.active_games: #game logic messages
-            game = commands.active_games[message.channel.id]
+        if message.channel.id in quiz_logic.active_games: #game logic messages
+            game = quiz_logic.active_games[message.channel.id]
             await game.process_answer(message.author.id, message.content)
         await bot.process_commands(message)
 
@@ -82,9 +83,9 @@ def run_discord_bot():
         await interaction.response.send_message(randomNumber)
 
     @bot.tree.command(name="quizplay", description="Play a quiz and choose how many questions you want to play!")
-    @app_commands.describe(quiz_id = "Id of the quiz you want to play. Use /quizlist if you are unsure.", questions = "Number of questions you want to play.")
-    async def start_game(ctx, quiz_id: int):
-        if ctx.channel.id in commands.active_games:
+    @app_commands.describe(quiz_id = "Id of the quiz you want to play. Use /quizlist if you are unsure.",questions = "Number of questions you want to play.")
+    async def start_game(ctx, quiz_id: int, questions: int):
+        if ctx.channel.id in quiz_logic.active_games:
             embed = discord.Embed(
                 title="Error",
                 description="Game already in progress in this channel!",
@@ -93,15 +94,9 @@ def run_discord_bot():
             await ctx.channel.send(embed=embed)
             return
 
-        game = commands.QuizInstance(quiz_id, commands.quiz_initialize(quiz_id), ctx.channel)
-        commands.active_games[ctx.channel.id] = game
+        game = quiz_logic.QuizInstance(quiz_id, quiz_logic.quiz_initialize(quiz_id, questions), ctx.channel)
+        quiz_logic.active_games[ctx.channel.id] = game
         await game.start()
-
-
-
-
-
-
 
 
     bot.run(TOKEN)
