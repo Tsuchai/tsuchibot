@@ -88,6 +88,8 @@ class QuizEdit:
         try:
             for row in df.itertuples(index=False):
                 placeholders = ', '.join(['?'] * len(row))
+                row = list(row) #makes entries lowercase
+                row[1] = row[1].lower()
                 sql = f"INSERT INTO {name} VALUES ({placeholders})"
                 self.cursor.execute(sql, row)
             self.conn.commit()
