@@ -15,7 +15,7 @@ def quiz_initialize(quiz_id: int, questions: int):
         cursor.execute("SELECT quiz_name FROM masterQuiz WHERE quiz_id = ?", (quiz_id,))
         result = cursor.fetchone()
         if result is not None:
-            quiz_name=result[0]
+            quiz_name = result[0]
     except Exception as e:
         print(f"Error: {e}")
         return
@@ -29,6 +29,7 @@ def quiz_initialize(quiz_id: int, questions: int):
     answers = [row[1] for row in selected_rows]
     qa_tuple = tuple(zip(questions, answers))
     return qa_tuple
+
 
 def get_quiz_id(quiz_id: int):
     conn = sqlite3.connect('quiz.db')
@@ -99,7 +100,7 @@ class QuizInstance:
         high_score_name = await self.high_score()
         embed = discord.Embed(
             title=self.quiz_title,
-            description=f"Game over! {high_score_name} won with {max(self.players.values())} points!",
+            description=f"Game over! These are the ending scores: \n" + await self.high_score_list(),
             color=discord.Color.light_grey()
         )
         await self.channel.send(embed=embed)
@@ -115,7 +116,11 @@ class QuizInstance:
         if len(highest_score_players) == 1:
             player_id = highest_score_players[0]
             player = await guild.fetch_member(player_id)
-            return player.mention  # or player.name for just the name
+            #del self.players[player_id]
+            if highest_score == 1:
+                return player.mention + f": {highest_score} point"  # or player.name for just the name
+            else:
+                return player.mention + f": {highest_score} points"
 
         elif len(highest_score_players) == 2:
             player_ids = highest_score_players[:2]
@@ -123,7 +128,12 @@ class QuizInstance:
             for player_id in player_ids:
                 player = await guild.fetch_member(player_id)
                 player_mentions.append(player.mention)  # or player.name for just the names
-            return " and ".join(player_mentions)
+                #del self.players[player_id]
+            if highest_score == 1:
+                return " and ".join(player_mentions) + f": {highest_score} point"
+            else:
+                return " and ".join(player_mentions) + f": {highest_score} points"
+
 
         else:
             player_ids = highest_score_players[:-1]
@@ -131,7 +141,38 @@ class QuizInstance:
             for player_id in player_ids:
                 player = await guild.fetch_member(player_id)
                 player_mentions.append(player.mention)  # or player.name for just the names
-            return ", ".join(player_mentions) + f", and <@{highest_score_players[-1]}>"
+                #del self.players[player_id]
+            if highest_score == 1:
+                return ", ".join(player_mentions) + f", and <@{highest_score_players[-1]}>" + f": {highest_score} point"
+            else:
+                return ", ".join(player_mentions) + f", and <@{highest_score_players[-1]}>" + f": {highest_score} points"
+
+        #use this function in a loop to get every member who participated in the quiz
+        #ex: pop first place player, and iterate through until all players have been listed (can dynamically scale this
+        #i.e. top 5/10, etc)
+
+    async def high_score_list(self):
+        player_list = ""
+        player_list_count = 1
+        while self.players:
+            if player_list_count <= 3:
+                unicode_emoji = chr(0x1F947 + player_list_count - 1)
+                high_score = await self.high_score()
+                player_list += f"{unicode_emoji} {high_score}\n"
+                player_list_count += 1
+            else:
+                high_score = await self.high_score()
+                player_list += f"{player_list_count}. {high_score}\n"
+                player_list_count += 1
+            highest_score_players = [player_id for player_id, score in self.players.items() if
+                                     score == max(self.players.values())]
+            for player_id in highest_score_players:
+                del self.players[player_id]
+        return player_list
+
+
+
+
 
 
 

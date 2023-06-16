@@ -98,5 +98,11 @@ def run_discord_bot():
         quiz_logic.active_games[ctx.channel.id] = game
         await game.start()
 
+    # @bot.tree.command(name="quizlist", description="Lists the IDs for all the quizzes!")
+    # async def list_quizzes(interaction: discord.Interaction):
+    #     embed = discord.Embed(
+    #         title="Quiz List",
+    #         color=discord.Color.random()
+    #     ) quiz list stuff
 
     bot.run(TOKEN)
