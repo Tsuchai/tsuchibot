@@ -94,9 +94,22 @@ def run_discord_bot():
             await ctx.channel.send(embed=embed)
             return
 
-        game = quiz_logic.QuizInstance(quiz_id, quiz_logic.quiz_initialize(quiz_id, questions), ctx.channel)
+        quiz_set = quiz_logic.quiz_initialize(quiz_id, questions)
+        if len(quiz_set) == 0:
+            embed = discord.Embed(
+                title="Error",
+                description="Invalid quiz ID!",
+                color=discord.Color.light_grey()
+            )
+            await ctx.channel.send(embed=embed)
+            return
+
+        game = quiz_logic.QuizInstance(quiz_id, quiz_set, ctx.channel)
         quiz_logic.active_games[ctx.channel.id] = game
+
         await game.start()
+
+
 
     # @bot.tree.command(name="quizlist", description="Lists the IDs for all the quizzes!")
     # async def list_quizzes(interaction: discord.Interaction):

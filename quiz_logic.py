@@ -21,7 +21,6 @@ def quiz_initialize(quiz_id: int, questions: int):
         return
     try:
         cursor.execute(f"SELECT question, answer FROM {quiz_name} ORDER BY random() LIMIT {num_questions}")
-
     except Exception as e:
         print(f"Error: {e}")
     selected_rows = cursor.fetchall()
@@ -116,7 +115,7 @@ class QuizInstance:
         if len(highest_score_players) == 1:
             player_id = highest_score_players[0]
             player = await guild.fetch_member(player_id)
-            #del self.players[player_id]
+
             if highest_score == 1:
                 return player.mention + f": {highest_score} point"  # or player.name for just the name
             else:
@@ -127,8 +126,8 @@ class QuizInstance:
             player_mentions = []
             for player_id in player_ids:
                 player = await guild.fetch_member(player_id)
-                player_mentions.append(player.mention)  # or player.name for just the names
-                #del self.players[player_id]
+                player_mentions.append(player.mention)
+
             if highest_score == 1:
                 return " and ".join(player_mentions) + f": {highest_score} point"
             else:
@@ -140,8 +139,8 @@ class QuizInstance:
             player_mentions = []
             for player_id in player_ids:
                 player = await guild.fetch_member(player_id)
-                player_mentions.append(player.mention)  # or player.name for just the names
-                #del self.players[player_id]
+                player_mentions.append(player.mention)
+
             if highest_score == 1:
                 return ", ".join(player_mentions) + f", and <@{highest_score_players[-1]}>" + f": {highest_score} point"
             else:
